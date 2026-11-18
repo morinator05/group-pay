@@ -1,15 +1,10 @@
-import pytest
+# tests/test_health.py
 from fastapi.testclient import TestClient
+from app.main import app
 
-from app import server
-
-
-@pytest.fixture
-def client():
-    return TestClient(server)
+client = TestClient(app)
 
 
-def test_health(client):
-    """Test if the api is healthy (/health returns 200)"""
-    response = client.get("/health")
-    assert response.status_code == 200
+def test_health():
+    r = client.get("/health")
+    assert r.status_code == 200
