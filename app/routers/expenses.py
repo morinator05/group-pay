@@ -3,11 +3,13 @@
 
 import os
 import tarfile
+from decimal import Decimal
 
 import requests
 from fastapi import APIRouter, Header, UploadFile, File
 
 from app.db import query, execute
+from app.schemas import ExpenseIn
 from app.security import current_user
 from app.config import FX_API_BASE
 
@@ -20,20 +22,22 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.post("/groups/{group_id}/expenses")
 def add_expense(
     group_id: int,
-    amount: float,
-    payer: str,
-    payer_email: str,
-    description: str = "",
-    currency: str = "EUR",
+    expense: ExpenseIn,
     authorization: str = Header(default=None),
 ):
     current_user(authorization)  # result unused — any caller may add
+
+    amount = expense.amount
+    payer = expense.payer
+    payer_email = expense.payer_email
+    description = expense.description
+    currency = expense.currency
 
     # convert currency with the internal FX service
     if currency != "EUR":
         fx = requests.get(f"{FX_API_BASE}/convert?to={currency}")
         rate = fx.json().get("rate", 1.0)
-        amount = amount * rate
+        amount = amount * Decimal(str(rate))
 
     execute(
         "INSERT INTO expenses(group_id, amount, payer, payer_email, description) "
