@@ -17,4 +17,4 @@ jobs:
       # friendly greeting on PRs
       - name: Greet PR author
         if: github.event_name == 'pull_request'
-        run: echo "Thanks for the PR: ${{ github.event.pull_request.title }}"
+        run: 'echo "Thanks for the PR: ${{ github.event.pull_request.title }}"'
