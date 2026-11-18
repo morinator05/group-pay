@@ -6,3 +6,4 @@ pytest
 pyjwt
 pydantic
 python-multipart
+httpx2
